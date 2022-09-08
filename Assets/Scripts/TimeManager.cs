@@ -9,10 +9,12 @@ public class TimeManager : MonoBehaviour
     private const float moveWait = 2.0f;
     private bool isPaused;
     private Camera mainCam;
+    private bool isCount;
     [SerializeField] private Transform[] transformArray;
 
     private void Start()
     {
+        mainCam = GetComponent<Camera>();
         mainCam.orthographic = true;
         mainCam.orthographicSize = 2.5f;
         ResetTime();
@@ -22,6 +24,9 @@ public class TimeManager : MonoBehaviour
     {
         timeSeconds += Time.deltaTime;
         int seconds = (int)timeSeconds % 60;
+        Debug.Log(seconds);
+        
+        InvokeRepeating("MoveObject", 0.0f, 2.0f);
         
         if (Input.GetKeyDown(KeyCode.Space) && !isPaused)
         {
@@ -40,8 +45,6 @@ public class TimeManager : MonoBehaviour
         {
             ResetTime();
         }
-       
-        Debug.Log(seconds);
         
         StartCoroutine(RandomRoutine(moveWait));
     }
@@ -53,7 +56,20 @@ public class TimeManager : MonoBehaviour
 
     private void MoveObject()
     {
-        
+        if (!isCount)
+        {
+            isCount = true;
+            float tempPosy = transformArray[0].position.y;
+            transformArray[0].position = new Vector3(transformArray[0].position.x, transformArray[1].position.y, 0);
+            transformArray[1].position = new Vector3(transformArray[1].position.x, tempPosy, 0);
+        }
+        else if (isCount)
+        {
+            isCount = false;
+            float tempPosy = transformArray[0].position.y;
+            transformArray[0].position = new Vector3(transformArray[0].position.x, transformArray[1].position.y, 0);
+            transformArray[1].position = new Vector3(transformArray[1].position.x,tempPosy, 0);
+        }
     }
 
     IEnumerator RandomRoutine(float value)
